@@ -1,0 +1,6 @@
+$schema: https://azuremlschemas.azureedge.net/latest/data.schema.json
+name: diabetes-dev-folder
+version: 1
+type: uri_folder
+path: ../experimentation/data/
+description: Diabetes training data
