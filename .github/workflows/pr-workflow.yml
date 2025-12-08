@@ -5,7 +5,7 @@ on:
     # Trigger only when a PR is created
     types: [opened]
     # Optionally restrict to certain target branches
-    # branches: [ main, develop ]
+    branches: [ main, develop ]
 
 jobs:
   run-tests:
