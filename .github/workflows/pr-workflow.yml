@@ -16,7 +16,6 @@ jobs:
 
         uses: actions/checkout@v4
 
-      - name: Run tests
-
+      - name: Placeholder
         run: |
-          echo "Put your build/test commands here"
+          echo "Will add code checks here in next challenge"
