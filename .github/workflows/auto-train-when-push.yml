@@ -1,0 +1,75 @@
+name: Train diabetes model (dev + prod)
+
+on:
+  push:
+    branches: [ main ]
+
+env:
+  AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+  AZURE_RESOURCE_GROUP:  ${{ secrets.AZURE_RESOURCE_GROUP }}
+  AZURE_ML_WORKSPACE:    ${{ secrets.AZURE_ML_WORKSPACE }}
+
+jobs:
+  experiment:
+    name: Train in dev (experiment)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+
+        uses: actions/checkout@v4
+
+      - name: Azure login
+
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Install Azure ML CLI
+
+        run: |
+          az extension add -n ml -y
+
+      - name: Run dev training job
+
+        run: |
+          az account set --subscription "$AZURE_SUBSCRIPTION_ID"
+          az ml job create \
+            --file jobs/train-dev.yml \
+            --resource-group "$AZURE_RESOURCE_GROUP" \
+            --workspace-name "$AZURE_ML_WORKSPACE" \
+            --stream
+        # If the Azure ML job fails, this step fails, so the whole job fails.
+
+  production:
+    name: Train in prod
+    needs: experiment
+    # Only run if the experiment job (and its Azure ML job) succeeded
+    if: needs.experiment.result == 'success'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+
+        uses: actions/checkout@v4
+
+      - name: Azure login
+
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Install Azure ML CLI
+
+        run: |
+          az extension add -n ml -y
+
+      - name: Run prod training job
+
+        run: |
+          az account set --subscription "$AZURE_SUBSCRIPTION_ID"
+          az ml job create \
+            --file jobs/train-prod.yml \
+            --resource-group "$AZURE_RESOURCE_GROUP" \
+            --workspace-name "$AZURE_ML_WORKSPACE" \
+            --stream
