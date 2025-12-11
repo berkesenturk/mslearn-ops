@@ -3,4 +3,4 @@ name: diabetes-prod-folder
 version: 1
 type: uri_folder
 path: ../production/data/
-description: Diabetes training data
+description: Diabetes training data (Production)

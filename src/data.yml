@@ -3,4 +3,4 @@ name: diabetes-dev-folder
 version: 1
 type: uri_folder
 path: ../experimentation/data/
-description: Diabetes training data
+description: Diabetes training data (Development)
