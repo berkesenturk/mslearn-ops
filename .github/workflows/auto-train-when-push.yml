@@ -35,7 +35,7 @@ jobs:
         run: |
           az account set --subscription "$AZURE_SUBSCRIPTION_ID"
           az ml job create \
-            --file jobs/train-dev.yml \
+            --file src/experiment_job.yml \
             --resource-group "$AZURE_RESOURCE_GROUP" \
             --workspace-name "$AZURE_ML_WORKSPACE" \
             --stream
@@ -69,7 +69,7 @@ jobs:
         run: |
           az account set --subscription "$AZURE_SUBSCRIPTION_ID"
           az ml job create \
-            --file jobs/train-prod.yml \
+            --file src/production_job.yml \
             --resource-group "$AZURE_RESOURCE_GROUP" \
             --workspace-name "$AZURE_ML_WORKSPACE" \
             --stream
