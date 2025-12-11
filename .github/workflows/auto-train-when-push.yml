@@ -1,5 +1,7 @@
 name: Train diabetes model (dev + prod)
-
+deploy:
+  
+    
 on:
   push:
     branches: [ main ]
@@ -13,7 +15,10 @@ jobs:
   experiment:
     name: Train in dev (experiment)
     runs-on: ubuntu-latest
-
+    
+    environment:
+      name: "development"
+    
     steps:
       - name: Checkout repo
 
@@ -47,7 +52,10 @@ jobs:
     # Only run if the experiment job (and its Azure ML job) succeeded
     if: needs.experiment.result == 'success'
     runs-on: ubuntu-latest
-
+    
+    environment:
+      name: "production"
+    
     steps:
       - name: Checkout repo
 
