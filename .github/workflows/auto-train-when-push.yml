@@ -1,7 +1,5 @@
 name: Train diabetes model (dev + prod)
-deploy:
-  
-    
+
 on:
   push:
     branches: [ main ]
