@@ -36,7 +36,7 @@ jobs:
             echo "Dev data asset not found. Creating..."
             az ml data create -f src/data_dev.yml \
               --resource-group "$AZURE_RESOURCE_GROUP" \
-              --workspace-name "$AZURE_ML_WORKSPACE" \
+              --workspace-name "$AZURE_ML_WORKSPACE"
           fi
 
   data_prod:
