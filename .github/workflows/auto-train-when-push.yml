@@ -10,31 +10,82 @@ env:
   AZURE_ML_WORKSPACE:    ${{ secrets.AZURE_ML_WORKSPACE }}
 
 jobs:
+  data_dev:
+    name: Create data asset for development
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+      - name: Azure login
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+      
+      - name: Install Azure ML CLI
+        run: |
+          az extension add -n ml -y
+      - name: Create dev data asset if not exists
+
+        run: |
+          if az ml data show --name diabetes-data-dev --version 1 >/dev/null 2>&1; then
+            echo "Dev data asset already exists, skipping creation."
+          else
+            echo "Dev data asset not found. Creating..."
+            az ml data create -f src/data_dev.yml
+          fi
+
+  data_prod:
+    name: Create data asset for production
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+      - name: Azure login
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+      
+      - name: Install Azure ML CLI
+        run: |
+          az extension add -n ml -y
+      - name: Create prod data asset if not exists
+
+        run: |
+          if az ml data show --name diabetes-data-prod --version 1 >/dev/null 2>&1; then
+            echo "Prod data asset already exists, skipping creation."
+          else
+            echo "Prod data asset not found. Creating..."
+            az ml data create -f src/data_prod.yml
+          fi
   experiment:
     name: Train in dev (experiment)
     runs-on: ubuntu-latest
+    
+    needs: 
+      - data_dev
+      - data_prod
+    # Only run if the experiment job (and its Azure ML job) succeeded
+    if: needs.data_dev.result == 'success' && needs.data_prod.result == 'success'
     
     environment:
       name: "development"
     
     steps:
       - name: Checkout repo
-
         uses: actions/checkout@v4
 
       - name: Azure login
-
         uses: azure/login@v2
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
       - name: Install Azure ML CLI
-
         run: |
           az extension add -n ml -y
 
       - name: Run dev training job
-
         run: |
           az account set --subscription "$AZURE_SUBSCRIPTION_ID"
           az ml job create \
@@ -56,22 +107,18 @@ jobs:
     
     steps:
       - name: Checkout repo
-
         uses: actions/checkout@v4
 
       - name: Azure login
-
         uses: azure/login@v2
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
       - name: Install Azure ML CLI
-
         run: |
           az extension add -n ml -y
 
       - name: Run prod training job
-
         run: |
           az account set --subscription "$AZURE_SUBSCRIPTION_ID"
           az ml job create \
