@@ -93,7 +93,6 @@ jobs:
             --resource-group "$AZURE_RESOURCE_GROUP" \
             --workspace-name "$AZURE_ML_WORKSPACE" \
             --stream
-        # If the Azure ML job fails, this step fails, so the whole job fails.
 
   production:
     name: Train in prod
