@@ -34,13 +34,15 @@ jobs:
             echo "Dev data asset already exists, skipping creation."
           else
             echo "Dev data asset not found. Creating..."
-            az ml data create -f src/data_dev.yml
+            az ml data create -f src/data_dev.yml \
+              --resource-group "$AZURE_RESOURCE_GROUP" \
+              --workspace-name "$AZURE_ML_WORKSPACE" \
           fi
 
   data_prod:
     name: Create data asset for production
     runs-on: ubuntu-latest
-    
+
     environment:
       name: "production"
       
@@ -62,7 +64,9 @@ jobs:
             echo "Prod data asset already exists, skipping creation."
           else
             echo "Prod data asset not found. Creating..."
-            az ml data create -f src/data_prod.yml
+            az ml data create -f src/data_prod.yml \
+              --resource-group "$AZURE_RESOURCE_GROUP" \
+              --workspace-name "$AZURE_ML_WORKSPACE" \
           fi
   experiment:
     name: Train in dev (experiment)
