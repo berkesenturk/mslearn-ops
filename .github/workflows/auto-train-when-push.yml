@@ -98,7 +98,7 @@ jobs:
   production:
     name: Train in prod
     needs: experiment
-    # Only run if the experiment job (and its Azure ML job) succeeded
+    
     if: needs.experiment.result == 'success'
     runs-on: ubuntu-latest
     
