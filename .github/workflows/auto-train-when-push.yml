@@ -13,6 +13,8 @@ jobs:
   data_dev:
     name: Create data asset for development
     runs-on: ubuntu-latest
+    environment:
+      name: "development"
 
     steps:
       - name: Checkout repo
@@ -38,7 +40,10 @@ jobs:
   data_prod:
     name: Create data asset for production
     runs-on: ubuntu-latest
-
+    
+    environment:
+      name: "production"
+      
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
