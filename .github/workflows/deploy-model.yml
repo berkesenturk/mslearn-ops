@@ -41,7 +41,7 @@ jobs:
             --name "$MODEL_NAME" \
             --resource-group "$AZURE_RESOURCE_GROUP" \
             --workspace-name "$AZURE_ML_WORKSPACE" \
-            --query "max_by([].{version:version, t:created_time}, &t).version" \
+            --query "max_by(@, &to_number(version)).version" \
             -o tsv)
 
           if [ -z "$LATEST_VERSION" ]; then
