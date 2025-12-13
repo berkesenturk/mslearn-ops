@@ -32,7 +32,7 @@ jobs:
         run: |
           if az ml data show --name diabetes-dev-folder \
             --version 1 --workspace-name "$AZURE_ML_WORKSPACE" \
-            -- resource-group "$AZURE_RESOURCE_GROUP" >/dev/null 2>&1; then
+            --resource-group "$AZURE_RESOURCE_GROUP" >/dev/null 2>&1; then
             echo "Dev data asset already exists, skipping creation."
           else
             echo "Dev data asset not found. Creating..."
@@ -60,11 +60,12 @@ jobs:
         run: |
           az extension add -n ml -y
       - name: Create prod data asset if not exists
-
         run: |
-          if az ml data show --name diabetes-prod-folder \
-            --version 1 --workspace-name "$AZURE_ML_WORKSPACE" \
-            -- resource-group "$AZURE_RESOURCE_GROUP" >/dev/null 2>&1; then
+          if az ml data show \
+            --name diabetes-prod-folder \
+            --version 1 \
+            --workspace-name "$AZURE_ML_WORKSPACE" \
+            --resource-group "$AZURE_RESOURCE_GROUP" >/dev/null 2>&1; then
             echo "Prod data asset already exists, skipping creation."
           else
             echo "Prod data asset not found. Creating..."
