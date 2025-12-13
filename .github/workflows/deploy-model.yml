@@ -1,0 +1,63 @@
+name: Deploy latest model
+
+on:
+  workflow_dispatch:   # run manually; you can also add "push" triggers
+
+env:
+  MODEL_NAME: my-model
+  ENDPOINT_NAME: my-endpoint
+  DEPLOYMENT_NAME: blue
+  AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+  AZURE_RESOURCE_GROUP: ${{ secrets.AZURE_RESOURCE_GROUP }}
+  AZURE_ML_WORKSPACE: ${{ secrets.AZURE_ML_WORKSPACE }}
+
+jobs:
+  deploy-latest:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+
+        uses: actions/checkout@v4
+
+      - name: Azure login
+
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Install Azure ML CLI
+
+        run: |
+          az extension add -n ml -y
+          az account set --subscription "$AZURE_SUBSCRIPTION_ID"
+
+      - name: Get latest model version
+
+        id: get_model
+        run: |
+          LATEST_VERSION=$(az ml model list \
+            --name "$MODEL_NAME" \
+            --resource-group "$AZURE_RESOURCE_GROUP" \
+            --workspace-name "$AZURE_ML_WORKSPACE" \
+            --query "max_by([].{version:version, t:created_time}, &t).version" \
+            -o tsv)
+
+          if [ -z "$LATEST_VERSION" ]; then
+            echo "No versions found for model $MODEL_NAME"
+            exit 1
+          fi
+
+          echo "Latest version is $LATEST_VERSION"
+          echo "LATEST_MODEL_VERSION=$LATEST_VERSION" >> $GITHUB_OUTPUT
+
+      - name: Deploy latest model to endpoint
+
+        run: |
+          az ml online-deployment update \
+            --name "$DEPLOYMENT_NAME" \
+            --endpoint "$ENDPOINT_NAME" \
+            --resource-group "$AZURE_RESOURCE_GROUP" \
+            --workspace-name "$AZURE_ML_WORKSPACE" \
+            --model "azureml:${{ env.MODEL_NAME }}:${{ steps.get_model.outputs.LATEST_MODEL_VERSION }}" \
+            --set instance_count=1
