@@ -75,7 +75,7 @@ jobs:
     needs: 
       - data_dev
       - data_prod
-    # Only run if the experiment job (and its Azure ML job) succeeded
+
     if: needs.data_dev.result == 'success' && needs.data_prod.result == 'success'
     
     environment:
