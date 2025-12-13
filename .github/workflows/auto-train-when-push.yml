@@ -105,7 +105,7 @@ jobs:
           az ml job create \
             --file src/experiment_job.yml \
             --resource-group "$AZURE_RESOURCE_GROUP" \
-            --workspace-name "$AZURE_ML_WORKSPACE" 
+            --workspace-name "$AZURE_ML_WORKSPACE" \
             --stream
 
   production:
