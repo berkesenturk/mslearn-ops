@@ -4,7 +4,7 @@ on:
   workflow_dispatch:   # run manually; you can also add "push" triggers
 
 env:
-  MODEL_NAME: my-model
+  MODEL_NAME: diabetes-model
   ENDPOINT_NAME: my-endpoint
   DEPLOYMENT_NAME: blue
   AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
