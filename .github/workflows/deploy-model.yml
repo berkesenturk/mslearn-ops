@@ -60,5 +60,4 @@ jobs:
             --endpoint "$ENDPOINT_NAME" \
             --resource-group "$AZURE_RESOURCE_GROUP" \
             --workspace-name "$AZURE_ML_WORKSPACE" \
-            --model "azureml:${{ env.MODEL_NAME }}:${{ steps.get_model.outputs.LATEST_MODEL_VERSION }}" \
-            --set instance_count=1
+            --set model="azureml:${{ env.MODEL_NAME }}:${{ steps.get_model.outputs.LATEST_MODEL_VERSION }}" instance_count=1
