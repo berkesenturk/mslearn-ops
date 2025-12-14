@@ -29,7 +29,7 @@ jobs:
           az extension add -n ml -y
           az account set --subscription "$AZURE_SUBSCRIPTION_ID"
 
-      - name: Create endpoint if not exists
+      - name: Create endpoint
         run: |
           az ml online-endpoint create \
             --file src/create_endpoint.yml \
@@ -37,7 +37,6 @@ jobs:
             -w "$AZURE_ML_WORKSPACE"
 
       - name: Get latest model version
-
         id: get_model
         run: |
           LATEST_VERSION=$(az ml model list \
@@ -56,11 +55,10 @@ jobs:
           echo "LATEST_MODEL_VERSION=$LATEST_VERSION" >> $GITHUB_OUTPUT
 
       - name: Deploy latest model to endpoint
-
         run: |
           az ml online-deployment create \
             --name "$DEPLOYMENT_NAME" \
             --resource-group "$AZURE_RESOURCE_GROUP" \
             --workspace-name "$AZURE_ML_WORKSPACE" \
-            --file src/deploy_model_to_endpoint.yml
+            --file src/deploy_model_to_endpoint.yml \
             --set model="azureml:${{ env.MODEL_NAME }}:${{ steps.get_model.outputs.LATEST_MODEL_VERSION }}"
