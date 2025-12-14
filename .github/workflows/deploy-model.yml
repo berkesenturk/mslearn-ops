@@ -5,7 +5,6 @@ on:
 
 env:
   MODEL_NAME: diabetes-model
-  ENDPOINT_NAME: my-endpoint
   DEPLOYMENT_NAME: blue
   AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
   AZURE_RESOURCE_GROUP: ${{ secrets.AZURE_RESOURCE_GROUP }}
@@ -18,20 +17,24 @@ jobs:
       name: "production"
     steps:
       - name: Checkout
-
         uses: actions/checkout@v4
 
       - name: Azure login
-
         uses: azure/login@v2
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
       - name: Install Azure ML CLI
-
         run: |
           az extension add -n ml -y
           az account set --subscription "$AZURE_SUBSCRIPTION_ID"
+
+      - name: Create endpoint if not exists
+        run: |
+          az ml online-endpoint create \
+            --file src/create_endpoint.yml \
+            -g "$AZURE_RESOURCE_GROUP" \
+            -w "$AZURE_ML_WORKSPACE"
 
       - name: Get latest model version
 
@@ -55,9 +58,9 @@ jobs:
       - name: Deploy latest model to endpoint
 
         run: |
-          az ml online-deployment update \
+          az ml online-deployment create \
             --name "$DEPLOYMENT_NAME" \
-            --endpoint "$ENDPOINT_NAME" \
             --resource-group "$AZURE_RESOURCE_GROUP" \
             --workspace-name "$AZURE_ML_WORKSPACE" \
-            --set model="azureml:${{ env.MODEL_NAME }}:${{ steps.get_model.outputs.LATEST_MODEL_VERSION }}" instance_count=1
+            --file src/deploy_model_to_endpoint.yml
+            --set model="azureml:${{ env.MODEL_NAME }}:${{ steps.get_model.outputs.LATEST_MODEL_VERSION }}"
